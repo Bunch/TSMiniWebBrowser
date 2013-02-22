@@ -450,8 +450,16 @@ enum actionSheetButtonIndex {
 #pragma mark - UIWebViewDelegate
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    if ([[request.URL absoluteString] hasPrefix:@"sms:"]) {
-        [[UIApplication sharedApplication] openURL:request.URL];
+    if ([[request.URL absoluteString] hasPrefix:@"sms:"] || [[request.URL absoluteString] hasPrefix:@"tumblr:"]) {
+        if ([[UIApplication sharedApplication] canOpenURL:request.URL]) {
+            [[UIApplication sharedApplication] openURL:request.URL];
+        } else {
+            [[[UIAlertView alloc] initWithTitle:@"Oops!"
+                                        message:@"It looks like you don't have this iOS app installed."
+                                       delegate:nil
+                              cancelButtonTitle:@"Okay"
+                              otherButtonTitles:nil] show];
+        }
         return NO;
     }
 	
