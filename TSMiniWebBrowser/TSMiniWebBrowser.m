@@ -26,6 +26,13 @@
 
 #import "TSMiniWebBrowser.h"
 
+@interface TSMiniWebBrowser ()
+{
+    CGFloat _titleBarHeight;
+}
+
+@end
+
 @implementation TSMiniWebBrowser
 
 @synthesize delegate;
@@ -99,13 +106,18 @@ enum actionSheetButtonIndex {
 
 // This method is only used in modal mode
 -(void) initTitleBar {
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
+        _titleBarHeight = 44;
+    } else {
+        _titleBarHeight = 64;
+    }
     UIBarButtonItem *buttonDone = [[UIBarButtonItem alloc] initWithTitle:modalDismissButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(dismissController)];
     
     UINavigationItem *titleBar = [[UINavigationItem alloc] initWithTitle:@""];
     titleBar.leftBarButtonItem = buttonDone;
     
     CGFloat width = self.view.frame.size.width;
-    navigationBarModal = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, 44)];
+    navigationBarModal = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, width, _titleBarHeight)];
     //navigationBar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
     navigationBarModal.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     navigationBarModal.barStyle = barStyle;
@@ -178,12 +190,12 @@ enum actionSheetButtonIndex {
 -(void) initWebView {
     CGSize viewSize = self.view.frame.size;
     if (mode == TSMiniWebBrowserModeModal) {
-        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, kToolBarHeight, viewSize.width, viewSize.height-kToolBarHeight*2)];
+        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, _titleBarHeight, viewSize.width, viewSize.height-(kToolBarHeight+_titleBarHeight))];
     } else if(mode == TSMiniWebBrowserModeNavigation) {
         webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, viewSize.width, viewSize.height-kToolBarHeight)];
     } else if(mode == TSMiniWebBrowserModeTabBar) {
         self.view.backgroundColor = [UIColor redColor];
-        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, kToolBarHeight-1, viewSize.width, viewSize.height-kToolBarHeight+1)];
+        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, _titleBarHeight-1, viewSize.width, viewSize.height-_titleBarHeight+1)];
     }
     webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:webView];
